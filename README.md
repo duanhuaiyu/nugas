@@ -1,2 +1,1 @@
-# nugas
-NuGas: Computing Flavor Oscillations in Dense Neutrino Gases
+# NuGas: Computing Flavor Oscillations in Dense Neutrino Gases
