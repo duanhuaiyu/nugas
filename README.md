@@ -10,6 +10,6 @@ There are more than one way to install `NuGas`:
 - If you are an advanced user and want to adapt the `NuGas` to your own needs, you can use `git` to clone the `NuGas` repository, `cd` into the `nugas` directory, and type the following command:   
 `python3 -m pip install .`
 
-`NuGas` is free to use under the MIT license. (See `LICENSE.txt` for details.)
+`NuGas` is free to use under the MIT license. (See `LICENSE` for details.)
 
 This material is based upon work supported by the U.S. Department of Energy, Office of Science, Office of Nuclear Physics under Award Number DE-SC-0017803.
