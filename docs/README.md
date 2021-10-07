@@ -8,4 +8,4 @@ This directory contains the following [Jupyter Notebooks](https://jupyter.org) t
 
 ## `f2e0d1a`: Two-Flavor, Energy Independent, One-Dimensional, Axisymmetric Model
 - `dispersion-relations.ipynb` shows how to compute the flavor isospin wave solutions and their dispersion relations for the 1D axisymmetric model.
-- The example of solving the equation of motion numerically is coming soon.
+- `fast-oscillations.ipynb` demonstrates how to solve the equation of motion numerically.
