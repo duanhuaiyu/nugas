@@ -21,10 +21,10 @@ class NuGas:
         'lsoda': False
     }
 
-    def __init__(self, t=0., P=None, z=None, u=None, weights=None, g=None, pdz="fd5", integrator="RK45", int_kargs={}, data_file=None, clobber=False, load=False, attrs={}, eom_c=False, log_file=sys.stdout):
+    def __init__(self, t=0., P=None, z=None, u=None, weights=None, g=None, pdz="fd5", integrator="RK45", int_kargs={}, data_file=None, history='readonly', attrs={}, eom_c=False, log_file=sys.stdout):
         '''Initialize a calculation.
         t : initial time.
-        P[Nz,3,Nu] : NumPy array of the initial polarization vector.
+        P[Nz,Nu,3] : NumPy array of the initial polarization vector.
         z[Nz] : NumPy array of the spatial mesh.
         u[Nu] : NumPy array of the angular mesh.
         weights[Nu] : NumPy array of the angular weights; sum of f(u)*weights gives the integral of f.
@@ -33,18 +33,26 @@ class NuGas:
         integrator : integration method for time evolution.
         int_kargs : keyword arguments to be passed to the integrator. Default is empty.
         data_file : name of the file to store flavor history.
-        clobber : whether to overwite the existing file if starting a new history. Default is False.
-        load : whether to load an existing history and append to it. Default is False.
+        history : 'new' to start a new data file (and overwrite anyfile of the same name), 'continue' to load the data file and continue, and 'readonly' to load the data file for read only. Default is 'readonly'.
         attrs : a dictionary of attributes to be save to the data file.
         eom_c : whether to use C++ version of eom. Default is False.
         log_file : name of the file to record log message. Default is sys.stdout.
         '''
-        if load: # load and append to an existing history
-            assert data_file, "Must supply a file name to load an existing history."
-            t, P, dt = self._load(data_file)
+        if data_file:
+            if history == 'readonly':
+                t, P, dt = self._load(data_file)
+                self._readonly = True
+                return
+            elif history == 'new':
+                t, P, dt = self._new(t, P, z, u, weights, g, data_file, True, attrs)
+            elif history == 'continue':
+                t, P, dt = self._load(data_file, readonly=False)
+            else:
+                raise Exception(f'Unknown value for {history}')
+        else: # no data file
+            t, P, dt = self._new(t, P, z, u, weights, g)
 
-        else: # start a new flavor history
-            t, P, dt = self._new(t, P, z, u, weights, g, data_file, clobber, attrs)
+        self._readonly = False 
 
         self._logger = logger(log_file)
         # set up the integrator
@@ -86,6 +94,7 @@ class NuGas:
 
         return : (current time, current P)
         '''        
+        assert not self._readonly, "The flavor history is read only"
         try: # check if t is an array
             Nt = len(t)
             tt = np.array(t, dtype=np.double)
@@ -151,14 +160,15 @@ class NuGas:
 
         return t, P, dt
 
-    def _load(self, data_file):
+    def _load(self, data_file, readonly=True):
         '''Initialize the model from a data file.
         data_file : name of the data file.
+        readonly : whether to load the history for read only.
 
         return : (t, P), the last time and polarization, and the number of points for differencing.
         '''
         from ..misc.ionetcdf import FlavorHistory
-        self._history = FlavorHistory(data_file, load=True)
+        self._history = FlavorHistory(data_file, load=True, readonly=readonly)
         self.t = self._history.data.variables['t'] # time points
         t = self.t[-1] # current time
         dt = self._history.data.variables['dt'][-1]
@@ -171,7 +181,7 @@ class NuGas:
         self.g0 = np.array(self._history.data.variables['g0'][:]) # angle weights
         return t, P, dt
 
-    def _new(self, t, P, z, u, weights, g, data_file, clobber, attrs):
+    def _new(self, t, P, z, u, weights, g, data_file=None, clobber=False, attrs={}):
         '''Initialize the model from input parameters. See __init__() for the meanings of the arguments.
         return : t, P, dt
         '''

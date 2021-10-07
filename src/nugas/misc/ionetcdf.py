@@ -5,7 +5,7 @@ Author: Huaiyu Duan (UNM)
 class FlavorHistory:
     '''I/O object of NuGas.
     '''
-    def __init__(self, filename, clobber=False, attr={}, dim={}, var={}, var_ini={}, load=False):
+    def __init__(self, filename, clobber=False, attr={}, dim={}, var={}, var_ini={}, load=False, readonly=False):
         '''Initialization of the I/O object.
         filename : name of the file.
         clobber : whether to overwrite the existing file. Default is False.
@@ -18,10 +18,17 @@ class FlavorHistory:
         }. Only the first dimension of a variable can be unlimited (length=None).
         var_ini : dictionary of the initial values of the variables in the format {"name1": value1, ...}. If the first dimension of the variable is unlimited, the value is stored to the first row of the record.
         load : whether to load and append to an existing history. Default is False.
+        readonly : whether to load the history as readonly. Default is False.
         '''
         import netCDF4 as nc
-        if load: # append to an existing history
-            self.data = nc.Dataset(filename, "r+") # data object
+        if load: # load an existing history
+            if readonly: # read the history only
+                import os
+                os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
+                self.data = nc.Dataset(filename, "r") # data object
+            else: # append the history
+                self.data = nc.Dataset(filename, "r+") # data object
+    
             # find the unlimited dimension
             udim = None
             for name, dim in self.data.dimensions.items():
