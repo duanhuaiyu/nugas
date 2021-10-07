@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 ext_par = {
     'name' : 'nugas',
-    'version' : '1.0',
+    'version' : '1.1',
     'description' : 'Python package that computes flavor oscillations in dense neutrino gases.',
     'url' : 'https://github.com/NuCO-UNM/nugas',
     'author' : 'Huaiyu Duan',
