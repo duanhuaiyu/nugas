@@ -20,13 +20,14 @@ class FlavorHistory:
         load : whether to load and append to an existing history. Default is False.
         readonly : whether to load the history as readonly. Default is False.
         '''
-        import netCDF4 as nc
         if load: # load an existing history
             if readonly: # read the history only
                 import os
                 os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
+                import netCDF4 as nc
                 self.data = nc.Dataset(filename, "r") # data object
             else: # append the history
+                import netCDF4 as nc
                 self.data = nc.Dataset(filename, "r+") # data object
     
             # find the unlimited dimension
@@ -46,6 +47,7 @@ class FlavorHistory:
             self.Nt = len(self.data.variables[self.uvar[0]]) # number of records stored
 
         else:
+            import netCDF4 as nc
             self.data = nc.Dataset(filename, "w", clobber=clobber) # data object
             # create attributes
             for name, val in attr.items():
