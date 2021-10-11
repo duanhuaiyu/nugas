@@ -44,7 +44,7 @@ class NuGas:
                 self._readonly = True
                 return
             elif history == 'new':
-                t, P, dt = self._new(t, P, z, u, weights, g, data_file, True, attrs)
+                t, P, dt = self._new(t, P, z, u, weights, g, data_file, False, attrs)
             elif history == 'continue':
                 t, P, dt = self._load(data_file, readonly=False)
             else:
