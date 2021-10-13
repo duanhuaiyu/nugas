@@ -8,7 +8,7 @@ There are more than one way to install `NuGas`:
 - If you are a casual user, try typing the following command in a terminal to install `NuGas`:  
 `python3 -m pip install --upgrade git+https://github.com/NuCO-UNM/nugas.git`  
 - If you are an advanced user and want to adapt the `NuGas` to your own needs, you can use `git` to clone the `NuGas` repository, `cd` into the `nugas` directory, and type the following command:   
-`python3 -m pip install .`
+`python3 -m pip install -e . --log log.txt`
 
 `NuGas` is free to use under the MIT license. (See `LICENSE` for details.)
 
